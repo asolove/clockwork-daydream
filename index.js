@@ -8,14 +8,7 @@ var app = express();
 
 var asyncRead = Promise.promisify(read);
 
-asyncRead({ prompt:'Please enter your Jira username:' }).then(function(username) {
-    // not sure why read or the promisified version returns an array
-    app.set('username', username[0]);
-    return asyncRead({ prompt:'Please enter your Jira password:', silent: true });
-}).then(function(password) {
-    // not sure why read or the promisified version returns an array
-    app.set('password', password[0]);
-
+var setupExpress = function() {
     // set up express
     app.engine('handlebars', handlebars.engine);
     app.set('view engine', 'handlebars');
@@ -39,6 +32,18 @@ asyncRead({ prompt:'Please enter your Jira username:' }).then(function(username)
         console.log('Express started on http://localhost:' +
                 app.get('port') + '; press Ctrl-C to terminate.');
     });
+};
+
+// need to capture credentials, password is safest interactively
+asyncRead({ prompt:'Please enter your Jira username:' }).then(function(username) {
+    // not sure why read or the promisified version returns an array
+    app.set('username', username[0]);
+    return asyncRead({ prompt:'Please enter your Jira password:', silent: true });
+}).then(function(password) {
+    // not sure why read or the promisified version returns an array
+    app.set('password', password[0]);
+
+    setupExpress();
 });
 
 
