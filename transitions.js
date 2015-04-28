@@ -1,14 +1,17 @@
-var http = require('http');
+var https = require('https');
 
 module.exports = {
     dwell: function(req, res) {
-        var url = 'https://' + req.app.get('username') +
-            ':' + req.app.get('password') +
-            '@jira.freewebs.com/resta/api/2/listFields';
-        http.get(url, function(response) {
+        var options = {
+            hostname: 'jira.freewebs.com',
+            path: '/rest/api/2/field',
+            auth: req.app.get('username') + ':' + req.app.get('password')
+        };
+        https.get(options, function(response) {
             if (response.statusCode !== 200) {
                 console.error('Failed', response.statusCode);
             }
+
             var body = '';
             response.on('data', function(chunk) {
                 body += chunk;
@@ -16,10 +19,10 @@ module.exports = {
 
             response.on('end', function() {
                 console.log(body);
+                res.render('dwell');
             });
         }).on('error', function(e) {
             console.error(e);
         });
-        res.render('dwell');
     }
 };

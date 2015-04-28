@@ -8,12 +8,14 @@ var app = express();
 
 var asyncRead = Promise.promisify(read);
 
-// gather Jira credentials, hopefully somewhat securely
 asyncRead({ prompt:'Please enter your Jira username:' }).then(function(username) {
-    app.set('username', username);
+    // not sure why read or the promisified version returns an array
+    app.set('username', username[0]);
     return asyncRead({ prompt:'Please enter your Jira password:', silent: true });
 }).then(function(password) {
-    app.set('password', password);
+    // not sure why read or the promisified version returns an array
+    app.set('password', password[0]);
+
     // set up express
     app.engine('handlebars', handlebars.engine);
     app.set('view engine', 'handlebars');
