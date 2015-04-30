@@ -1,9 +1,7 @@
 <h1>Jira Statistics</h1>
-<div id="selectView" />
-<script type="text/jsx">
-    React.render(
-        <ViewSelect />,
-        document.getElementById('selectView')
-    );
+<div id="selectView"></div>
+<script type="text/javascript">
+    console.log('Loading');
+    window.statsTools.renderApp(document.getElementById('selectView'));
+    console.log('Loaded');
 </script>
-</ul>
