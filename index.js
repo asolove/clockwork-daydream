@@ -33,6 +33,7 @@ app.listen(app.get('port'), function() {
         // not sure why read or the promisified version returns an array
         app.set('password', password[0]);
 
-        app.set('streams', jira.streamField(app.get('username'), app.get('password')));
+        app.set('streams', jira.streams(app.get('username'), app.get('password')));
+        app.set('rapidviews', jira.rapidViews(app.get('username'), app.get('password')));
     });
 });
