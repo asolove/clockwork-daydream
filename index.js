@@ -1,4 +1,4 @@
-var Promise = require('bluebird');
+var Promise = require('es6-promise').Promise;
 var express = require('express');
 var handlebars = require('express-handlebars').create({ defaultLayout: 'main' });
 var read = require('read');
@@ -6,7 +6,14 @@ var jira = require('./lib/jira');
 
 var app = express();
 
-var asyncRead = Promise.promisify(read);
+var asyncRead = function(options) {
+    return new Promise(function (resolve, reject) {
+        read(options, function(err, result) {
+            if (err !== null) reject(err);
+            resolve(result);
+        });
+    });
+};
 
 // set up express
 app.engine('handlebars', handlebars.engine);
@@ -27,11 +34,11 @@ app.listen(app.get('port'), function() {
     // need to capture credentials, password is safest interactively
     asyncRead({ prompt:'Please enter your Jira username:' }).then(function(username) {
         // not sure why read or the promisified version returns an array
-        app.set('username', username[0]);
+        app.set('username', username);
         return asyncRead({ prompt:'Please enter your Jira password:', silent: true });
     }).then(function(password) {
         // not sure why read or the promisified version returns an array
-        app.set('password', password[0]);
+        app.set('password', password);
 
         app.set('streams', jira.streams(app.get('username'), app.get('password')));
         app.set('rapidviews', jira.rapidViews(app.get('username'), app.get('password')));
