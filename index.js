@@ -1,6 +1,7 @@
-var Promise = require('es6-promise').Promise;
 var express = require('express');
 var handlebars = require('express-handlebars').create({ defaultLayout: 'main' });
+var Promise = require('es6-promise').Promise;
+var path = require('path');
 var read = require('read');
 var jira = require('./lib/jira');
 
@@ -19,7 +20,8 @@ var asyncRead = function(options) {
 app.engine('handlebars', handlebars.engine);
 app.set('view engine', 'handlebars');
 app.set('port', process.env.PORT || 3000);
-app.use(express.static(__dirname + '/public'));
+app.use(express.static(path.join(__dirname, 'public')));
+app.use(express.static(path.join(__dirname, 'dist')));
 
 // routes
 // default route

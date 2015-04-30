@@ -17,6 +17,19 @@
     "es6-promise": "^2.1.1",
     "express": "^4.12.3",
     "express-handlebars": "^2.0.1",
+    "react": "^0.13.2",
     "read": "^1.0.5"
+  },
+  "devDependencies": {
+    "browserify": "^9.0.8",
+    "grunt": "^0.4.5",
+    "grunt-browserify": "^3.7.0",
+    "grunt-contrib-clean": "^0.6.0",
+    "grunt-contrib-jshint": "^0.11.2",
+    "grunt-newer": "^1.1.0",
+    "grunt-react": "^0.12.2",
+    "grunt-watchify": "^0.1.0",
+    "load-grunt-tasks": "^3.1.0",
+    "watchify": "^3.2.0"
   }
 }
