@@ -4,6 +4,7 @@ var Promise = require('es6-promise').Promise;
 var path = require('path');
 var read = require('read');
 var jira = require('./lib/jira');
+var routes = require('./routes/index');
 
 var app = express();
 
@@ -29,10 +30,13 @@ app.get('/', function(req, res) {
     res.render('home');
 });
 
+app.get('/views', routes.views);
+
 // spin up the server
 app.listen(app.get('port'), function() {
     console.log('Express started on http://localhost:' +
             app.get('port') + '; press Ctrl-C to terminate.');
+
     // need to capture credentials, password is safest interactively
     asyncRead({ prompt:'Please enter your Jira username:' }).then(function(username) {
         // not sure why read or the promisified version returns an array
@@ -42,7 +46,7 @@ app.listen(app.get('port'), function() {
         // not sure why read or the promisified version returns an array
         app.set('password', password);
 
-        app.set('streams', jira.streams(app.get('username'), app.get('password')));
-        app.set('rapidviews', jira.rapidViews(app.get('username'), app.get('password')));
+        jira.streams(app);
+        jira.views(app);
     });
 });
