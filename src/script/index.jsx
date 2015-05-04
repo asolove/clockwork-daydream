@@ -80,7 +80,7 @@ var JiraStats = React.createClass({
         return (
             <div>
                 <ViewSelect views={this.state.views} />
-                <SprintSelect 
+                <SprintSelect
                     view={this.state.viewId}
                     sprints={this.state.sprints}
                 />
