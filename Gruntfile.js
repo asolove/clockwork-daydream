@@ -29,6 +29,17 @@ module.exports = function(grunt) {
             }
         },
 
+        copy: {
+            main: {
+                files: [{
+                    expand: true,
+                    cwd: 'src/',
+                    src: [ '**/*.js' ],
+                    dest: 'build/'
+                }]
+            }
+        },
+
         // bundle from the root script out of plain and transpiled sources
         browserify: {
             main: {
@@ -52,6 +63,7 @@ module.exports = function(grunt) {
 
     grunt.registerTask('build', 'Build and bundle scripts', [
         'jshint',
+        'newer:copy',
         'newer:react',
         'newer:browserify'
     ]);
