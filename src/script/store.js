@@ -1,53 +1,57 @@
 var Reflux = require('reflux');
+var Promise = require('es6-promise').Promise;
 var http = require('http');
 
 var Store = Reflux.createStore({
     listenables: require('./actions'),
 
-    onLoadViews: function() {
-        console.log('Loading views.');
-        http.get('/views', function(response) {
-            var data = '';
+    _get: function(path) {
+        return new Promise(function(resolve, reject) {
+            http.get(path, function(response) {
+                var data = '';
 
-            response.on('data', function(buf) {
-                data += buf;
+                response.on('data', function(buf) {
+                    data += buf;
+                });
+
+                response.on('end', function() {
+                    try {
+                        resolve(JSON.parse(data));
+                    } catch(err) {
+                        reject(err);
+                    }
+                });
+            }).on('error', function(err) {
+                reject(err);
             });
+        });
+    },
 
-            response.on('end', function() {
-                try {
-                    var result = JSON.parse(data);
-                    this.trigger({ views: result });
-                } catch(err) {
-                    console.error(err);
-                }
-            }.bind(this));
-        }.bind(this)).on('error', function(err) {
+    onLoadViews: function() {
+        this._get('/views').then(function(result) {
+            this.trigger({ views: result });
+        }.bind(this)).catch(function(err) {
             console.error(err);
         });
     },
 
     onSelectView: function(id) {
-        http.get('/sprints/' + id, function(response) {
-            var data = '';
-
-            response.on('data', function(buf) {
-                data += buf;
+        this._get('/sprints/' + id).then(function(result) {
+            this.trigger({
+                viewId: id,
+                sprints: result
             });
-
-            response.on('end', function() {
-                try {
-                    var result = JSON.parse(data);
-                    this.trigger({ sprints: result });
-                } catch(err) {
-                    console.error(err);
-                }
-            }.bind(this));
-        }.bind(this)).on('error', function(err) {
+        }.bind(this)).catch(function(err) {
             console.error(err);
         });
     },
 
-    onSelectSprint: function(id) {
+    onSelectSprint: function(viewId, sprintId) {
+        this._get('/sprint/' + viewId + '/' + sprintId).then(function(result) {
+            console.log(result);
+        }.bind(this)).catch(function(err) {
+            console.error(err);
+        });
     }
 });
 

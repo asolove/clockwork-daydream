@@ -31,6 +31,8 @@ app.get('/', function(req, res) {
 });
 
 app.get('/views', routes.views);
+app.get('/sprints/:id', routes.sprints);
+app.get('/sprint/:viewId/:sprintId', routes.sprint);
 
 // spin up the server
 app.listen(app.get('port'), function() {

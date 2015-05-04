@@ -19,5 +19,12 @@ module.exports = {
             });
             res.json(sprints);
         });
+    },
+
+    sprint: function(req, res) {
+        jira.sprint(req.app, req.params.viewId, req.params.sprintId).then(function(result) {
+            // TODO cache sprint data
+            console.log(result);
+        });
     }
 };

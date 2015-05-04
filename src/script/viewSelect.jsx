@@ -1,10 +1,13 @@
 var React = require('react');
+var Actions = require('./actions');
 
 var ViewSelect = React.createClass({
     onSelectView: function() {
         var views = this.refs.views.getDOMNode();
         var selected = views.options[views.selectedIndex];
-        console.log(selected);
+        if (selected.value != 'none') {
+            Actions.selectView(selected.value);
+        }
     },
 
     render: function() {
