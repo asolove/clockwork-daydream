@@ -3,9 +3,12 @@ Small node app that uses Jira's REST API to extract some useful statistics Jira'
 
 ## To Install
 Clone this repo, then run
-{{{
+```
 npm install
 grunt
 npm start
-}}}
+```
 Starting the app will prompt for a username and password to access Jira. Once the credentials have been provided, open http://localhost:3000/ in a browser.
+
+## How to Help
+I've started capturing my thoughts on next steps in the issues, take a look there.
