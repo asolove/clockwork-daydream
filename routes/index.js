@@ -41,7 +41,7 @@ module.exports = {
             // TODO cache sprint data
             var issues = [].concat(result.contents.completedIssues, result.contents.incompletedIssues);
             Promise.all(issues.map(function(issue) {
-                return jira.issueChangeLog(req.app, issue.id).then(function(issue) {
+                return jira.issueChangeLog(req.session.options, issue.id).then(function(issue) {
                     // TODO can this be tightened up, perhaps with lodash?
                     var lastDate = new Date(issue.fields.created);
                     return issue.changelog.histories.filter(function(history) {
