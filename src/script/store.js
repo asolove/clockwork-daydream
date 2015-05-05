@@ -1,13 +1,14 @@
 var Reflux = require('reflux');
 var Promise = require('es6-promise').Promise;
-var http = require('http');
+var https = require('https');
+var Actions = require('./actions');
 
 var Store = Reflux.createStore({
-    listenables: require('./actions'),
+    listenables: Actions,
 
     _get: function(path) {
         return new Promise(function(resolve, reject) {
-            http.get(path, function(response) {
+            https.get(path, function(response) {
                 var data = '';
 
                 response.on('data', function(buf) {
@@ -24,6 +25,66 @@ var Store = Reflux.createStore({
             }).on('error', function(err) {
                 reject(err);
             });
+        });
+    },
+
+    _post: function(path, data) {
+        return new Promise(function(resolve, reject) {
+            var dataString = JSON.stringify(data);
+
+            var headers = {
+                'Content-Type': 'application/json',
+                'Content-Length': dataString.length
+            };
+
+            var options = {
+                hostname: location.hostname,
+                port: location.port,
+                path: path,
+                method: 'POST',
+                headers: headers
+            };
+
+            var req = https.request(options, function(response) {
+                var data = '';
+
+                response.on('data', function(buf) {
+                    data += buf;
+                });
+
+                response.on('end', function() {
+                    try {
+                        resolve(JSON.parse(data));
+                    } catch(err) {
+                        reject(err);
+                    }
+                });
+            }).on('error', function(err) {
+                reject(err);
+            });
+
+            req.write(dataString);
+            req.end();
+        });
+    },
+
+    onLogin: function(hostname, username, password) {
+        var options = {
+            hostname: hostname,
+            username: username,
+            password: password
+        };
+        this._post('/login', options).then(function(res) {
+            if (res.success) {
+                Actions.loadViews();
+                this.trigger({ authenticated: true });
+            } else {
+                console.error(res.error);
+                this.trigger({ authenticated: true, message: 'Login failed.' });
+            }
+        }.bind(this)).catch(function(err) {
+            console.error(err);
+            this.trigger({ authenticated: true, message: 'Login failed.' });
         });
     },
 

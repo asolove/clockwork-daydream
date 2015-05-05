@@ -2,18 +2,32 @@ var jira = require('../lib/jira');
 var Promise = require('es6-promise').Promise;
 
 module.exports = {
+    login: function(req, res) {
+        var options = {
+            hostname: req.body.hostname,
+            auth: req.body.username + ':' + req.body.password
+        };
+
+        req.session.options = options;
+
+        jira.views(options).then(function(result) {
+            req.session.views = result.views.filter(function(view) {
+                return view.sprintSupportEnabled;
+            }).map(function(view) {
+                return { id: view.id, name: view.name };
+            });
+            res.json({ success: true });
+        }).catch(function(err) {
+            res.json({ success: false, error: err });
+        });
+    },
+
     views: function(req, res) {
-        if (!req.app.get('jira.views')) {
-            jira.views(req.app);
-            // TODO signal client to retry?
-            res.end([]);
-            return;
-        }
-        res.json(req.app.get('jira.views'));
+        res.json(req.session.views);
     },
 
     sprints: function(req, res) {
-        jira.sprints(req.app, req.params.id).then(function(result) {
+        jira.sprints(req.session.options, req.params.id).then(function(result) {
             // TODO cache sprints
             var sprints = result.sprints.map(function(sprint) {
                 return ({ id: sprint.id, name: sprint.name });
@@ -23,7 +37,7 @@ module.exports = {
     },
 
     sprint: function(req, res) {
-        jira.sprint(req.app, req.params.viewId, req.params.sprintId).then(function(result) {
+        jira.sprint(req.session.options, req.params.viewId, req.params.sprintId).then(function(result) {
             // TODO cache sprint data
             var issues = [].concat(result.contents.completedIssues, result.contents.incompletedIssues);
             Promise.all(issues.map(function(issue) {

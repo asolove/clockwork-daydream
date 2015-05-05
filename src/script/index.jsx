@@ -4,6 +4,7 @@ var Store = require('./store');
 var Actions = require('./actions');
 var ViewSelect = require('./viewSelect');
 var SprintSelect = require('./sprintSelect');
+var LoginForm = require('./loginForm');
 var _ = require('lodash');
 
 if (window) {
@@ -17,16 +18,13 @@ if (window) {
 var JiraStats = React.createClass({
     mixins: [Reflux.connect(Store)],
 
-    componentDidMount: function() {
-        Actions.loadViews();
-    },
-
     getInitialState: function() {
         return ({
             views: [],
             sprints: [],
             dwells: [],
-            loading: false
+            loading: false,
+            authenticated: false
         });
     },
 
@@ -77,17 +75,24 @@ var JiraStats = React.createClass({
                 </div>
             );
         }.bind(this));
+        var loginStyle = { display: (this.state.authenticated) ? 'none' : '' };
+        var reportStyle = { display: (this.state.authenticated) ? '' : 'none' };
         return (
             <div>
-                <ViewSelect views={this.state.views} />
-                <SprintSelect
-                    view={this.state.viewId}
-                    sprints={this.state.sprints}
-                />
-                <div>
-                    {loading}
-                    {content}
-                    <div>*including same ticket in same status repeatedly</div>
+                <div style={loginStyle}>
+                    <LoginForm message={this.state.message} />
+                </div>
+                <div style={reportStyle}>
+                    <ViewSelect views={this.state.views} />
+                    <SprintSelect
+                        view={this.state.viewId}
+                        sprints={this.state.sprints}
+                    />
+                    <div>
+                        {loading}
+                        {content}
+                        <div>*including same ticket in same status repeatedly</div>
+                    </div>
                 </div>
             </div>
         );

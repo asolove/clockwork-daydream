@@ -1,6 +1,7 @@
 var Reflux = require('reflux');
 
 var Actions = Reflux.createActions([
+    'login',
     'loadViews',
     'selectView',
     'selectSprint'
