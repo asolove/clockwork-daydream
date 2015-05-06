@@ -6,6 +6,7 @@ var Actions = require('./actions');
 var Store = Reflux.createStore({
     listenables: Actions,
 
+    // execute an HTTP GET against an end point assumed to return JSON
     _get: function(path) {
         return new Promise(function(resolve, reject) {
             https.get(path, function(response) {
@@ -28,6 +29,8 @@ var Store = Reflux.createStore({
         });
     },
 
+    // execute an HTTP POST against an end point assumed to accept and return
+    // JSON
     _post: function(path, data) {
         return new Promise(function(resolve, reject) {
             var dataString = JSON.stringify(data);
@@ -68,6 +71,8 @@ var Store = Reflux.createStore({
         });
     },
 
+    // use the server's end point to log and, if successful, load the Jira board
+    // views
     onLogin: function(hostname, username, password) {
         var options = {
             hostname: hostname,
@@ -88,6 +93,7 @@ var Store = Reflux.createStore({
         });
     },
 
+    // fetch the availalbe Jira board views from the server
     onLoadViews: function() {
         this._get('/views').then(function(result) {
             this.trigger({ views: result });
@@ -96,6 +102,7 @@ var Store = Reflux.createStore({
         });
     },
 
+    // fetch the sprints for the selected Jira board view
     onSelectView: function(id) {
         this._get('/sprints/' + id).then(function(result) {
             this.trigger({
@@ -107,10 +114,16 @@ var Store = Reflux.createStore({
         });
     },
 
+    // fetch report data for the selected sprint
     onSelectSprint: function(viewId, sprintId) {
         this.trigger({ loading: true, dwells: [] });
         this._get('/sprint/' + viewId + '/' + sprintId).then(function(result) {
-            this.trigger({ dwells: result, loading: false });
+            this.trigger({
+                start: new Date(result.start),
+                dwells: result.dwells,
+                timeline: result.timeline,
+                loading: false
+            });
         }.bind(this)).catch(function(err) {
             console.error(err);
         });
