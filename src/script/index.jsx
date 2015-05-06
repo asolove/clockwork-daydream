@@ -9,8 +9,11 @@ var _ = require('lodash');
 
 if (window) {
     window.statsTools = {
-        renderApp: function(rootEl) {
-            React.render(<JiraStats />, rootEl);
+        renderApp: function(rootEl, authenticated) {
+            React.render(<JiraStats authenticated={authenticated}/>, rootEl);
+            if (authenticated) {
+                Actions.loadViews();
+            }
         }
     };
 }
@@ -18,13 +21,17 @@ if (window) {
 var JiraStats = React.createClass({
     mixins: [Reflux.connect(Store)],
 
+    propTypes: {
+        authenticated: React.PropTypes.bool.isRequired
+    },
+
     getInitialState: function() {
         return ({
             views: [],
             sprints: [],
             dwells: [],
             loading: false,
-            authenticated: false
+            authenticated: this.props.authenticated
         });
     },
 
@@ -82,16 +89,22 @@ var JiraStats = React.createClass({
                 <div style={loginStyle}>
                     <LoginForm message={this.state.message} />
                 </div>
-                <div style={reportStyle}>
+                <div style={reportStyle}
+                    className="report-container"
+                >
                     <ViewSelect views={this.state.views} />
                     <SprintSelect
                         view={this.state.viewId}
                         sprints={this.state.sprints}
                     />
-                    <div>
+                    <div className="report-quadrant">
+                        <h2>Average Dwell Time</h2>
                         {loading}
                         {content}
                         <div>*including same ticket in same status repeatedly</div>
+                    </div>
+                    <div className="report-quadrant">
+                        <h2>Event Timeline</h2>
                     </div>
                 </div>
             </div>

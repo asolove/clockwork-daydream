@@ -1,9 +1,7 @@
 <h1>Jira Statistics</h1>
 <div id="content">
-    <div id="selectView"></div>
 </div>
 <script type="text/javascript">
-    console.log('Loading');
-    window.statsTools.renderApp(document.getElementById('content'));
-    console.log('Loaded');
+    window.statsTools.renderApp(document.getElementById('content'),
+        {{authenticated}});
 </script>

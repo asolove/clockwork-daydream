@@ -24,7 +24,7 @@ app.use(require('body-parser').json());
 // routes
 // default route
 app.get('/', function(req, res) {
-    res.render('home');
+    res.render('home', { authenticated: req.session.options !== undefined });
 });
 app.get('/views', routes.views);
 app.get('/sprints/:id', routes.sprints);

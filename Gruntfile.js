@@ -29,6 +29,14 @@ module.exports = function(grunt) {
             }
         },
 
+        less: {
+            all: {
+                files: {
+                    'dist/default.css': 'src/style/default.less'
+                }
+            }
+        },
+
         copy: {
             main: {
                 files: [{
@@ -64,6 +72,7 @@ module.exports = function(grunt) {
     grunt.registerTask('build', 'Build and bundle scripts', [
         'jshint',
         'newer:copy',
+        'newer:less',
         'newer:react',
         'newer:browserify'
     ]);
