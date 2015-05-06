@@ -3,7 +3,14 @@ var React = require('react');
 var Status = React.createClass({
     propTypes: {
         status: React.PropTypes.string.isRequired,
-        tickets: React.PropTypes.array.isRequired
+        tickets: React.PropTypes.array.isRequired,
+        expand: React.PropTypes.bool
+    },
+
+    getInitialState: function() {
+        return ({
+            expand: (this.props.expand === null) ? true : this.props.expand
+        });
     },
 
     _pluralize: function(items, term) {
@@ -18,6 +25,7 @@ var Status = React.createClass({
         } else {
             detail.classList.add('hidden');
         }
+        this.setState({ expand: detail.classList.contains('hidden') });
     },
 
     render: function() {
@@ -30,9 +38,11 @@ var Status = React.createClass({
                 </li>
             );
         });
+        var clickStyle = { cursor: 'pointer' };
         return (
-            <div onClick={this.toggleDetail}>
+            <div onClick={this.toggleDetail} style={clickStyle}>
                 <div>
+                    {(this.state.expand) ? '+' : '-'}
                     {this._pluralize()} moved to <strong>{this.props.status}</strong>
                 </div>
                 <div ref="detail" className="details hidden">

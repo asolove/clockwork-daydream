@@ -1,11 +1,19 @@
 var React = require('react');
 var Status = require('./status');
+var _ = require('lodash');
 
 var TimelineDay = React.createClass({
     propTypes: {
         index: React.PropTypes.number.isRequired,
         startTime: React.PropTypes.number.isRequired,
         transitions: React.PropTypes.array.isRequired
+    },
+
+    getInitialState: function() {
+        return ({
+            expandAll: true,
+            expand: true
+        });
     },
 
     // TODO desired statuses and ordering should be configurable
@@ -35,6 +43,34 @@ var TimelineDay = React.createClass({
         }
     },
 
+    _pluralize: function() {
+        return '' + this.props.transitions.length + ' ' +
+            ((this.props.transitions.length === 1) ? 'change' : 'changes');
+    },
+
+    toggleDetail: function() {
+        var detail = this.refs.detail.getDOMNode();
+        if (detail.classList.contains('hidden')) {
+            detail.classList.remove('hidden');
+        } else {
+            detail.classList.add('hidden');
+        }
+        this.setState({ expand: detail.classList.contains('hidden') });
+    },
+
+    toggleMoreDetail: function() {
+        var detail = this.refs.detail.getDOMNode();
+        var moreDetails = detail.querySelectorAll('.details');
+        _.forEach(moreDetails, function(moreDetail) {
+            if (this.state.expandAll) {
+                moreDetail.classList.remove('hidden');
+            } else {
+                moreDetail.classList.add('hidden');
+            }
+        }.bind(this));
+        this.setState({ expandAll: !this.state.expandAll });
+    },
+
     render: function() {
         var day = this._toDate();
         var statuses = {};
@@ -55,13 +91,24 @@ var TimelineDay = React.createClass({
                 <Status key={idx}
                     status={key}
                     tickets={statuses[key]}
+                    expand={this.state.expandAll}
                 />
             );
         });
+        var clickStyle = { cursor: 'pointer' };
         return (
             <div>
-                <h3>{this._dayOfWeek(day.getDay())}</h3>
-                {transitions}
+                <h3 onClick={this.toggleDetail} style={clickStyle}>
+                    {(this.state.expand) ? '+' : '-'}
+                    {this._dayOfWeek(day.getDay())}
+                </h3>
+                <div ref="summary" className="summary">{this.pluralize}</div>
+                <div ref="detail" className="details hidden">
+                    <div ref="moredetail" onClick={this.toggleMoreDetail} style={clickStyle}>
+                        {(this.state.expandAll) ? '+Expand All' : '-Collapse All'}
+                    </div>
+                    {transitions}
+                </div>
             </div>
         );
     }
