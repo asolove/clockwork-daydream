@@ -51,6 +51,11 @@ module.exports = {
         jira.sprint(req.session.options, req.params.viewId, req.params.sprintId).then(function(result) {
             // TODO cache sprint data
             var issues = [].concat(result.contents.completedIssues, result.contents.incompletedIssues);
+            var startOfSprint = new Date(result.sprint.startDate);
+            startOfSprint.setHours(0);
+            startOfSprint.setMinutes(0);
+            startOfSprint.setSeconds(0);
+            startOfSprint.setMilliseconds(0);
             // coordinate across all the async calls for issue details
             Promise.all(issues.map(function(sprintIssue) {
                 return jira.issueChangeLog(req.session.options, sprintIssue.id).then(function(issue) {
@@ -65,27 +70,44 @@ module.exports = {
                         var interested = history.items.filter(function(item) {
                             return item.field === 'status';
                         });
-                        var end = new Date(history.created);
-                        var dwell = end.getTime() - lastDate.getTime();
-                        lastDate = end;
-                        return { dwell: dwell, status: interested[0].fromString };
+                        var changed = new Date(history.created);
+                        var dwell = changed.getTime() - lastDate.getTime();
+                        lastDate = changed;
+                        return {
+                            key: issue.key,
+                            summary: issue.fields.summary,
+                            dwell: dwell,
+                            from: interested[0].fromString,
+                            to: interested[0].toString,
+                            dayOfSprint: (changed.getTime() - startOfSprint.getTime()) % (24 * 60 * 60 * 1000)
+                        };
                     });
                 });
             // filter and map out the info of interest once all tickets are
             // availalbe so all info can be rendered at once
-            })).then(function (values) {
+            })).then(function (result) {
                 var dwells = {};
-                values.forEach(function(issueList) {
-                    issueList.forEach(function(dwell) {
-                        if (!(dwell.status in dwells)) {
-                            dwells[dwell.status] = [];
+                var timeline = {};
+                result.forEach(function(transitions) {
+                    transitions.forEach(function(transition) {
+                        if (!(transition.from in dwells)) {
+                            dwells[transition.from] = [];
                         }
-                        dwells[dwell.status].push(dwell.dwell);
+                        dwells[transition.from].push(transition.dwell);
+                        if (!(transition.dayOfSprint in timeline)) {
+                            timeline[transition.dayOfSprint] = [];
+                        }
+                        timeline[transition.dayOfSprint].push(transition);
                     });
                 });
                 res.json({
-                    dwells: dwells
+                    start: startOfSprint,
+                    dwells: dwells,
+                    timeline: timeline
                 });
+            }).catch(function(err) {
+                console.error(err);
+                res.json({ dwells: [] });
             });
         });
     }
