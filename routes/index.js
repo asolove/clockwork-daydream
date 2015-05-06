@@ -69,7 +69,9 @@ module.exports = {
                         dwells[dwell.status].push(dwell.dwell);
                     });
                 });
-                res.json(dwells);
+                res.json({
+                    dwells: dwells
+                });
             });
         });
     }
