@@ -118,7 +118,12 @@ var Store = Reflux.createStore({
     onSelectSprint: function(viewId, sprintId) {
         this.trigger({ loading: true, dwells: [] });
         this._get('/sprint/' + viewId + '/' + sprintId).then(function(result) {
-            this.trigger({ dwells: result.dwells, loading: false });
+            this.trigger({
+                start: new Date(result.start),
+                dwells: result.dwells,
+                timeline: result.timeline,
+                loading: false
+            });
         }.bind(this)).catch(function(err) {
             console.error(err);
         });

@@ -79,7 +79,7 @@ module.exports = {
                             dwell: dwell,
                             from: interested[0].fromString,
                             to: interested[0].toString,
-                            dayOfSprint: (changed.getTime() - startOfSprint.getTime()) % (24 * 60 * 60 * 1000)
+                            dayOfSprint: Math.floor((changed.getTime() - startOfSprint.getTime()) / (24 * 60 * 60 * 1000))
                         };
                     });
                 });

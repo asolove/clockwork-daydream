@@ -5,6 +5,7 @@ var Actions = require('./actions');
 var ViewSelect = require('./viewSelect');
 var SprintSelect = require('./sprintSelect');
 var LoginForm = require('./loginForm');
+var Timeline = require('./timeline');
 var _ = require('lodash');
 
 if (window) {
@@ -30,6 +31,7 @@ var JiraStats = React.createClass({
             views: [],
             sprints: [],
             dwells: [],
+            timeline: {},
             loading: false,
             authenticated: this.props.authenticated
         });
@@ -77,11 +79,16 @@ var JiraStats = React.createClass({
             }, 0);
             var average = this._formatMs(sum / value.length);
             return (
-                <div>
+                <div key={key}>
                     {key}: {average} ({value.length} tickets in this status*)
                 </div>
             );
         }.bind(this));
+        if (content.length > 0) {
+            content.push(
+                <div key="hint">*including same ticket in same status repeatedly</div>
+            );
+        }
         var loginStyle = { display: (this.state.authenticated) ? 'none' : '' };
         var reportStyle = { display: (this.state.authenticated) ? '' : 'none' };
         return (
@@ -101,10 +108,13 @@ var JiraStats = React.createClass({
                         <h2>Average Dwell Time</h2>
                         {loading}
                         {content}
-                        <div>*including same ticket in same status repeatedly</div>
                     </div>
                     <div className="report-quadrant">
                         <h2>Event Timeline</h2>
+                        {loading}
+                        <Timeline start={this.state.start}
+                            timeline={this.state.timeline}
+                        />
                     </div>
                 </div>
             </div>
