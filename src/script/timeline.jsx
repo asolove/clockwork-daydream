@@ -1,28 +1,11 @@
 var React = require('react');
+var _ = require('lodash');
+var TimelineDay = require('./timelineDay');
 
 var Timeline = React.createClass({
     propTypes: {
         start: React.PropTypes.object,
         timeline: React.PropTypes.object
-    },
-
-    _dayOfWeek: function(idx) {
-        switch(idx) {
-            case 0:
-                return 'Sunday';
-            case 1:
-                return 'Monday';
-            case 2:
-                return 'Tuesday';
-            case 3:
-                return 'Wednesday';
-            case 4:
-                return 'Thursday';
-            case 5:
-                return 'Friday';
-            case 6:
-                return 'Saturday';
-        }
     },
 
     render: function() {
@@ -31,28 +14,19 @@ var Timeline = React.createClass({
         }
         var iteration = [];
         var startTime = this.props.start.getTime();
+        // TODO sprint iteration length should be configurable
         for (var i = 0; i < 14; i++) {
             iteration.push(i);
         }
-        console.log(this.props.timeline);
         var days = iteration.map(function(dayIdx) {
-            var day = new Date(startTime + (dayIdx * 24 * 60 * 60 * 1000));
-            var transitions = [];
-            if (dayIdx in this.props.timeline) {
-                transitions = this.props.timeline[dayIdx].map(function(transition, idx) {
-                    return (
-                        <div key={'transition-' + idx}>
-                            {transition.key} - {transition.summary}<br />
-                            Changed status to {transition.to}
-                        </div>
-                    );
-                });
-            }
+            var dayTransitions = (dayIdx in this.props.timeline) ?
+                this.props.timeline[dayIdx] : [];
             return (
-                <div key={'day-' + dayIdx}>
-                    <h3>{this._dayOfWeek(day.getDay())}</h3>
-                    {transitions}
-                </div>
+                <TimelineDay key={dayIdx}
+                    index={dayIdx}
+                    startTime={startTime}
+                    transitions={dayTransitions}
+                />
             );
         }.bind(this));
         return (
