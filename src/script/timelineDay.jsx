@@ -94,7 +94,7 @@ var TimelineDay = React.createClass({
                     expand={this.state.expandAll}
                 />
             );
-        });
+        }.bind(this));
         var clickStyle = { cursor: 'pointer' };
         return (
             <div>
