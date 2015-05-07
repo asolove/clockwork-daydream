@@ -52,7 +52,7 @@ module.exports = function(grunt) {
         browserify: {
             main: {
                 src: 'build/script/index.js',
-                dest: 'dist/jirastats.js'
+                dest: 'dist/clockwork-daydream.js'
             }
         },
 
