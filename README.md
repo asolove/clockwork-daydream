@@ -1,5 +1,5 @@
-# jirastats
-Small node app that uses Jira's REST API to extract some useful statistics Jira's own reports lack.
+# Clockwork Daydream
+A small node app intended to help Scrum Masters and other agile facilitators and coaches to turn raw data into shared perspectives. Initially, it draws from Jira's REST API to extract some useful information and present those in more understandable forms than Jira's own reports. Ideally, it will continue to evolve, to capture insights and information from team activities and possibly to pull from other useful or interesting data sources.
 
 ## To Install
 Clone this repo, then run
