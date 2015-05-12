@@ -24,7 +24,12 @@ app.use(require('body-parser').json());
 // routes
 // default route
 app.get('/', function(req, res) {
-    res.render('home', { authenticated: req.session.options !== undefined });
+    var locals = {
+        authenticated: req.session.options !== undefined,
+        view: req.session.view || -1,
+        sprint: req.session.sprint || -1
+    };
+    res.render('home', locals);
 });
 app.get('/views', routes.views);
 app.get('/sprints/:id', routes.sprints);
