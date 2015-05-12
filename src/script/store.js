@@ -104,9 +104,12 @@ var Store = Reflux.createStore({
 
     // fetch the sprints for the selected Jira board view
     onSelectView: function(id) {
+        // setting the sprint to -1 resets the client to the default since a
+        // change of view changes the available sprints
         this._get('/sprints/' + id).then(function(result) {
             this.trigger({
                 view: id,
+                sprint: -1,
                 sprints: result
             });
         }.bind(this)).catch(function(err) {
