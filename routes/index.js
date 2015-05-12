@@ -35,6 +35,8 @@ module.exports = {
     // for a provided Jira board, return the ids and names for the available
     // sprints
     sprints: function(req, res) {
+        // capture the selection so refresh just works
+        req.session.view = req.params.id;
         // TODO handle a direct call without logging in, perhaps a 401?
         jira.sprints(req.session.options, req.params.id).then(function(result) {
             // TODO cache sprints
@@ -48,6 +50,8 @@ module.exports = {
     // for a provided sprint, fetch a subset of detailed information for all
     // included tickets in the sprint
     sprint: function(req, res) {
+        // capture the selection so refresh just works
+        req.session.sprint = req.params.sprintId;
         jira.sprint(req.session.options, req.params.viewId, req.params.sprintId).then(function(result) {
             // TODO cache sprint data
             var issues = [].concat(result.contents.completedIssues, result.contents.incompletedIssues);

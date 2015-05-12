@@ -10,8 +10,11 @@ var _ = require('lodash');
 
 if (window) {
     window.statsTools = {
-        renderApp: function(rootEl, authenticated) {
-            React.render(<JiraStats authenticated={authenticated}/>, rootEl);
+        renderApp: function(rootEl, authenticated, view, sprint) {
+            React.render(<JiraStats authenticated={authenticated}
+                            view={view}
+                            sprint={sprint}
+                        />, rootEl);
             if (authenticated) {
                 Actions.loadViews();
             }
@@ -23,7 +26,9 @@ var JiraStats = React.createClass({
     mixins: [Reflux.connect(Store)],
 
     propTypes: {
-        authenticated: React.PropTypes.bool.isRequired
+        authenticated: React.PropTypes.bool.isRequired,
+        view: React.PropTypes.number,
+        sprint: React.PropTypes.number
     },
 
     getInitialState: function() {
@@ -33,7 +38,9 @@ var JiraStats = React.createClass({
             dwells: [],
             timeline: {},
             loading: false,
-            authenticated: this.props.authenticated
+            authenticated: this.props.authenticated,
+            view: this.props.view,
+            sprint: this.props.sprint,
         });
     },
 
@@ -99,9 +106,11 @@ var JiraStats = React.createClass({
                 <div style={reportStyle}
                     className="report-container"
                 >
-                    <ViewSelect views={this.state.views} />
-                    <SprintSelect
-                        view={this.state.viewId}
+                    <ViewSelect view={this.state.view}
+                        views={this.state.views}
+                    />
+                    <SprintSelect sprint={this.state.sprint}
+                        view={this.state.view}
                         sprints={this.state.sprints}
                     />
                     <div className="report-quadrant">
